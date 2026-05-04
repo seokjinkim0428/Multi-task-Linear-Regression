@@ -63,18 +63,18 @@ def safe_mtl_preprocessing(data, link="linear", intercept=True, n_class=1, stand
             tmp = np.hstack((np.ones((n_list[j], 1)), tmp))
         X.append(tmp)
 
+    if link == "logistic" and n_class > 2:
+        d_out = n_class
+        for y_dat in data[1]:
+            rows = np.arange(y_dat.shape[0])
+            encoded = np.zeros((y_dat.shape[0], n_class))
+            encoded[rows, y_dat.reshape(-1)] = 1
+            Y.append(encoded)
+    else:
         d_out = 1
-        if link == "logistic":
-            if n_class == 2:
-                for y_dat in data[1]:
-                    Y.append(y_dat.reshape(-1, 1))
-            else:
-                d_out = n_class
-        else:
-            for y_dat in data[1]:
-                Y.append(y_dat.reshape(-1, 1))
+        for y_dat in data[1]:
+            Y.append(y_dat.reshape(-1, 1))
 
-    d_out = 1 if n_class == 2 else n_class
     return [X, Y, X_means, X_stds, y_mean, y_std, n_list, d_out]
 
 

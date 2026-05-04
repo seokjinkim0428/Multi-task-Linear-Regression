@@ -87,10 +87,10 @@ def find_code_dir(start: Path | None = None, mount_drive: bool = True) -> Path:
 
 
 def default_figure_dir(code_dir: Path) -> Path:
-    """Choose a figure directory that works for both the paper repo and Colab."""
+    """Choose a figure directory that works for both full-repo and Colab runs."""
     code_dir = Path(code_dir).resolve()
     repo_root = code_dir.parent
-    if (repo_root / "MTLR.tex").exists() or (repo_root / "Images").exists():
+    if (repo_root / "Images").exists():
         return repo_root / "Images"
     return code_dir / "Images"
 

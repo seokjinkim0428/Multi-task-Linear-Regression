@@ -160,7 +160,7 @@ class Baselines:
         base.clustered_train(K = K, eta_B = eta_B, T = T, T_B = T_B)
         self.models['clustered'] = base.models['clustered']
         self.models['clustered_B'] = base.models['clustered_B']
-        self.models['clustered_Z'] = base.models['clustered_B']        
+        self.models['clustered_Z'] = base.models['clustered_Z']        
     
 
     def lowrank_train(self, data, K = 2, eta_B = 0.01, eta_Z = 0.01, T = 100, T_B = 1, T_Z = 1, standardization = True, intercept = True):
@@ -169,7 +169,7 @@ class Baselines:
         base.lowrank_train(K = K, eta_B = eta_B, eta_Z = eta_Z, T = T, T_B = T_B, T_Z = T_Z)
         self.models['lowrank'] = base.models['lowrank']
         self.models['lowrank_B'] = base.models['lowrank_B']
-        self.models['lowrank_Z'] = base.models['lowrank_B']
+        self.models['lowrank_Z'] = base.models['lowrank_Z']
 
 
     def predict(self, X_test, model = 'DP'):

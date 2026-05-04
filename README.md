@@ -12,47 +12,57 @@ assumptions on each task's empirical second moment matrix.
 
 ## Problem Setting
 
-Given $m$ tasks with observations
-$\mathcal{D}_j = \{(x_{ji}, y_{ji})\}_{i=1}^{n_j}$, each task follows a
-linear model
+Given `m` tasks with observations
 
-$$
+```math
+\mathcal{D}_j = \{(x_{ji}, y_{ji})\}_{i=1}^{n_j},
+\qquad j=1,\ldots,m,
+```
+
+each task follows a linear model
+
+```math
 y_{ji} = x_{ji}^\top \theta_j^\star + \varepsilon_{ji}.
-$$
+```
 
-Most tasks are assumed to be close to a shared centroid in $\ell_2$-norm, but
-an unknown fraction $\varepsilon$ of tasks may be arbitrary outliers. Unlike
+Most tasks are assumed to be close to a shared centroid in Euclidean norm, but
+an unknown fraction of tasks may be arbitrary outliers. Unlike
 standard robust multi-task regression guarantees, this work does not require a
 uniform lower bound on the smallest eigenvalue of each empirical second moment
 matrix
 
-$$
-\Sigma_j = \frac{1}{n_j} X_j^\top X_j.
-$$
+```math
+\Sigma_j = \frac{1}{n_j}\sum_{i=1}^{n_j} x_{ji}x_{ji}^\top.
+```
 
 The main performance metric is prediction risk, or MSE in the task-specific
-$\Sigma_j$-geometry, which remains meaningful under ill-conditioned or
+`Sigma_j` geometry, which remains meaningful under ill-conditioned or
 singular designs.
 
 ## Method Summary (MTLR)
 
 The proposed estimator uses matrix-weighted multi-task regularization:
 
-1. Compute the empirical second moment matrix $\Sigma_j$ for each task.
-2. Fit task parameters $\theta_j$ and a shared centroid $\beta$ by solving
+1. Compute the empirical second moment matrix for each task.
+2. Fit task-specific parameters and a shared centroid by solving a joint convex
+   objective.
+3. Select regularization multipliers by cross-validation.
+4. Compare against data pooling (DP), independent-task learning (ITL/STL), and
+   the ARMUL robust multi-task baseline of Duan and Wang (2023).
 
-$$
+```math
 \min_{\theta_1,\ldots,\theta_m,\beta}
 \sum_{j=1}^m w_j
 \left(
 f_j(\theta_j)
 + \lambda_j \|\theta_j - \beta\|_{\Sigma_j}
 \right).
-$$
+```
 
-3. Select regularization multipliers by cross-validation.
-4. Compare against data pooling (DP), independent-task learning (ITL/STL), and
-the ARMUL robust multi-task baseline of Duan and Wang (2023).
+Here, `f_j` denotes the empirical loss function for task `j`; for example, it
+is the squared loss in linear regression and the negative log-likelihood in a
+GLM such as logistic regression. Thus the same matrix-weighted regularization
+template also covers generalized linear model variants.
 
 In this repository, `ARMUL` refers to the adaptive robust multi-task learning
 method proposed in:
@@ -71,7 +81,8 @@ independent-task learning when transfer is unhelpful.
 * `MTLR_Synthetic.ipynb`  
   Notebook companion for the synthetic experiments in the paper.
 * `MTLR_Real-data.ipynb`  
-  Notebook companion for the real-data HAR experiment.
+  Notebook companion for the real-data HAR experiment, including the HAR
+  covariate balancedness diagnostic.
 * `synthetic_sweeps.py`  
   Synthetic experiment engine for sweeps over task radius, outlier fraction,
   eigendecay, and balancedness.
@@ -148,7 +159,10 @@ python real_data_har.py
 
 The HAR experiment treats subjects as tasks, uses raw 561-dimensional features
 with global Min-Max scaling, and evaluates binary classification error for the
-standing-vs-rest task.
+standing-vs-rest task. The notebook also reports a single `B_HAR` diagnostic
+for subject-level covariate balancedness. It is computed by comparing each
+subject covariance to `Sigma_all`, the empirical second moment over all HAR
+covariate samples.
 
 The script uses:
 
@@ -188,6 +202,8 @@ The script uses:
 * Positive label is HAR activity 5 (`STANDING`) by default.
 * Each split holds out 20% of each subject/task for testing.
 * Reported results are average held-out classification errors across tasks.
+* The real-data notebook also reports `B_HAR`, a plug-in balancedness estimate
+  using the all-sample HAR covariate second moment as the aggregate covariance.
 
 ## Reference
 

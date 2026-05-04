@@ -117,7 +117,7 @@ def MTL_preprocessing(data, link = 'linear', intercept = True, n_class = 1, stan
     n_list = np.zeros(m).astype(int)
 
     if not standardization:
-        X_means, X_stds = np.zeros((d, 1)), np.zeros((d, 1))
+        X_means, X_stds = np.zeros((d, 1)), np.ones((d, 1))
         if intercept:
             X_means = np.vstack((np.zeros((1, 1)), X_means))
             X_stds = np.vstack((np.ones((1, 1)), X_stds))
@@ -131,22 +131,23 @@ def MTL_preprocessing(data, link = 'linear', intercept = True, n_class = 1, stan
                 tmp = np.hstack((np.ones((n_list[j], 1)), tmp))
             X.append(tmp)
 
-            # load y
+        # load y
+        if link == 'linear':
             d_out = 1
-            if link == 'linear':
+            for y in data[1]:
+                Y.append(y.reshape(-1, 1))
+        if link == 'logistic':
+            if n_class == 2:
+                d_out = 1
                 for y in data[1]:
                     Y.append(y.reshape(-1, 1))
-            if link == 'logistic':
-                if n_class == 2:
-                    for y in data[1]:
-                        Y.append(y.reshape(-1, 1))
-                else: # n_class > 2, use one-hoc encoding
-                    d_out = n_class
-                    for y in data[1]:
-                        rows = np.arange(y.shape[0])
-                        tmp = np.zeros((y.shape[0], n_class))
-                        tmp[rows, y.reshape(-1,)] = 1
-                        Y.append(tmp)
+            else: # n_class > 2, use one-hoc encoding
+                d_out = n_class
+                for y in data[1]:
+                    rows = np.arange(y.shape[0])
+                    tmp = np.zeros((y.shape[0], n_class))
+                    tmp[rows, y.reshape(-1,)] = 1
+                    Y.append(tmp)
         return [X, Y, X_means, X_stds, y_mean, y_std, n_list, d_out]
 
     # with standardization (default)
